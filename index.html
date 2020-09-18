@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Hacked Hogwarts Student List</title>
+  </head>
+  <body id="body">
+    <header>
+      <img id="crest" src="/hog-crest.png" />
+    </header>
+    <div id="banner">
+      <h1>List of students for Hogwarts School 1991</h1>
+      <select>
+        <option value="all">All</option>
+        <option value="gryffindor">Gryffindor</option>
+        <option value="slytherin">Slytherin</option>
+        <option value="ravenclaw">Ravenclaw</option>
+        <option value="hufflepuff">Hufflepuff</option>
+        <option value="expelled">Expelled</option>
+        <option value="prefects">Prefects</option>
+        <option value="squad">Inquisitorial squad</option>
+      </select>
+      <button class="sort" id="FirstName">Firstname</button>
+      <button class="sort" id="LastName">Lastname</button>
+      <button>A-Z / Z-A</button>
+      <h2 class="num-stud">Showing X students</h2>
+    </div>
+
+    <!-- Template clone goes here -->
+
+    <main></main>
+    <div class="modal-background hide">
+      <div class="modal-content" id="modal-id">
+        <button id="close">&times;</button>
+        <h1 class="fullName">FULLNAME</h1>
+        <img id="house-crest" src="/g-crest.png" />
+        <img id="student-image" src="/images/potter_h.png" />
+        <h4 class="firstName">Firstname:</h4>
+        <h4 class="lastName">Lastname:</h4>
+        <h4 class="middleName">Middlename:</h4>
+        <h4 class="nickName">Nickname:</h4>
+        <h4 class="house">House:</h4>
+        <h4 class="bloodStatus">Blood status:</h4>
+        <h4 class="prefect">Prefect:</h4>
+        <h4 class="squad">Inquisitorial squad:</h4>
+        <h4 class="expelled">Expelled</h4>
+      </div>
+    </div>
+    <template>
+      <li class="thelist">
+        <h3 data-field="firstName" class="firstName">Firstname</h3>
+        <h3 data-field="lastName" class="lastName">Lastname</h3>
+        <h3 data-field="house" class="house">House in italic</h3>
+      </li>
+    </template>
+
+    <script src="script.js"></script>
+  </body>
+</html>
