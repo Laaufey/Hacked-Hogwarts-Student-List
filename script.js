@@ -13,6 +13,7 @@ let familyBlood;
 let allStudents = [];
 let usableData = [];
 let filteredData = [];
+let expelledData = [];
 const Student = {
   firstName: "",
   lastName: "",
@@ -20,10 +21,10 @@ const Student = {
   nickName: "",
   house: "",
   image: "",
-  expelled: "",
-  prefect: "",
+  expelled: false,
+  prefect: false,
   bloodStatus: "",
-  squad: "",
+  squad: false,
 };
 
 function start() {
@@ -83,14 +84,14 @@ function prepareObject(jsonObject) {
     );
   }
   if (fullName.includes(`"`)) {
-    student.middleName = null;
+    student.middleName = "";
   } else if (fullName.includes(" ")) {
     student.middleName = fullName.substring(
       fullName.indexOf(" ") + 1,
       fullName.lastIndexOf(" ") + 1
     );
   } else {
-    student.middleName = null;
+    student.middleName = "";
   }
   if (fullName.includes(`"`)) {
     student.nickName = fullName.substring(
@@ -98,7 +99,7 @@ function prepareObject(jsonObject) {
       fullName.lastIndexOf(" ") + 1
     );
   } else {
-    student.nickName = null;
+    student.nickName = "";
   }
 
   const lastNameFile = student.lastName.toLowerCase();
@@ -107,7 +108,7 @@ function prepareObject(jsonObject) {
 
   if (lastNameFile.includes("-")) {
     student.image =
-      "images/" +
+      "/images/" +
       lastNameFile.substring(lastNameFile.indexOf("-") + 1) +
       "_" +
       firstLetterFile +
@@ -158,7 +159,7 @@ function showModal(studentName) {
   modal.querySelector(".middleName").textContent = studentName.middleName;
   modal.querySelector(".nickName").textContent = studentName.nickName;
   modal.querySelector(".house").textContent = studentName.house;
-  modal.querySelector(".student-image").src = studentName.image;
+  modal.querySelector("#student-image").src = studentName.image;
 
   if (studentName.isPureBlood) {
     modal.querySelector(".bloodStatus").textContent = "Pure Blood";
@@ -167,9 +168,117 @@ function showModal(studentName) {
   } else {
     modal.querySelector(".bloodStatus").textContent = "Muggle Blood";
   }
+  // MAKE PREFECT
+
+  if (studentName.prefect === true) {
+    document.querySelector(".prefect").textContent = "is prefect";
+    document.querySelector("#prefect-btn").textContent = "Remove as prefect";
+  } else {
+    document.querySelector(".prefect").textContent = "not a prefect";
+    document.querySelector("#prefect-btn").textContent = "Make a prefect";
+  }
+
+  if (studentName.prefect === false) {
+    document
+      .querySelector("#prefect-btn")
+      .addEventListener("click", makePrefect);
+  } else {
+    document
+      .querySelector("#prefect-btn")
+      .addEventListener("click", prefectOff);
+  }
+  function makePrefect() {
+    console.log("Is Prefect");
+    document
+      .querySelector("#prefect-btn")
+      .removeEventListener("click", makePrefect);
+    addPrefect(studentName);
+  }
+  function prefectOff() {
+    console.log("Not a Prefect");
+    document
+      .querySelector("#prefect-btn")
+      .removeEventListener("click", prefectOff);
+    removePrefect(studentName);
+  }
+
+  // MAKE SQUAD
+
+  if (studentName.squad === true) {
+    document.querySelector(".squad").textContent = "is in the squad";
+    document.querySelector("#squad-btn").textContent = "Remove from squad";
+  } else {
+    document.querySelector(".squad").textContent = "not in the squad";
+    document.querySelector("#squad-btn").textContent = "Put in the squad";
+  }
+
+  if (studentName.squad === false) {
+    document.querySelector("#squad-btn").addEventListener("click", makeSquad);
+  } else {
+    document.querySelector("#squad-btn").addEventListener("click", squadOff);
+  }
+  function makeSquad() {
+    console.log("Is squad");
+    document
+      .querySelector("#squad-btn")
+      .removeEventListener("click", makeSquad);
+    addSquad(studentName);
+  }
+  function squadOff() {
+    console.log("Not a squad");
+    document.querySelector("#squad-btn").removeEventListener("click", squadOff);
+    removeSquad(studentName);
+  }
+}
+
+function removePrefect(studentName) {
+  console.log("remove prefectt");
+  studentName.prefect = false;
+  showModal(studentName);
+}
+function addPrefect(studentName) {
+  console.log("add prefectt");
+  studentName.prefect = true;
+  showModal(studentName);
+}
+function removeSquad(studentName) {
+  console.log("remove squad");
+  studentName.squad = false;
+  showModal(studentName);
+}
+function addSquad(studentName) {
+  console.log("add squad");
+  studentName.squad = true;
+  showModal(studentName);
 }
 
 // EXPEL STUDENT
+// function isExpelled() {
+//   for (let counter = 0; counter < allStudents.length; counter++) {
+//     if (allStudents[counter].firstName === "Laufey") {
+//     } else if (allStudents[counter].firstName === event.target.value) {
+//       allStudents[counter].expelled = true;
+//       // allStudents[counter].prefect = false;
+//       // allStudents[counter].inquisitorial = false;
+//       expelledData.push(allStudents[counter]);
+//       allStudents.splice(counter, 1);
+//       filteredList = allStudents;
+//     }
+//   }
+//   if (event.target.value === "Laufey") {
+//     alert("Sorry not sorry");
+//   } else {
+//     document.querySelector("h3.prefected").textContent = "";
+//     document.querySelector("h3.inquisitorial").textContent = "";
+//     document.querySelector("#optionExpelled").classList.remove("hide");
+//     document.querySelector("#expellButton").disabled = true;
+//     document.querySelector("#prefectButton").disabled = true;
+//     document.querySelector("#inquisitorialButton").disabled = true;
+//     document.querySelector("h5.expelled").classList.remove("hide");
+//     modal.classList.add("hide");
+//     displayData(filteredData);
+//   }
+// }
 
 // BLOOD
 // fara yfir og gera flottara og meira skiljanlegra en virkar
@@ -234,10 +343,6 @@ function filterList() {
     filteredList = allStudents.filter(isHufflePuff);
   } else if (dropdown.value === "expelled") {
     console.log("expelled");
-  } else if (dropdown.value === "prefects") {
-    console.log("prefects");
-  } else if (dropdown.value === "squad") {
-    console.log("squad");
   }
   displayList(filteredList);
 }
@@ -253,6 +358,20 @@ function isRavenclaw(student) {
 function isHufflePuff(student) {
   return student.house === "Hufflepuff";
 }
+function isPrefect(student) {
+  if (student.isPrefect === true) {
+    return true;
+  } else {
+    return false;
+  }
+}
+function isSquad(student) {
+  if (student.inInqSquad === true) {
+    return true;
+  } else {
+    return false;
+  }
+}
 function selectSort(event) {
   const sortBy = event.target.id;
   sortList(sortBy);
@@ -266,103 +385,6 @@ function sortList(sortBy) {
   }
   displayList(sortedList);
 }
-// function prepareData(json) {
-//   list.forEach((jsonObject) => {
-//     const student = Object.create(Student);
-//     const fullName = jsonObject.fullname.trim();
-//     // const splitted = fullName.split(" ");
-//     student.name = capitalize(fullName);
-//     student.house = capitalize(jsonObject.house.trim());
-//     if (fullName.includes(" ")) {
-//       student.firstName = capitalize(
-//         fullName.substring(0, fullName.indexOf(" "))
-//       );
-//     } else {
-//       student.firstName = capitalize(fullName);
-//     }
-//     if (fullName.includes(" ")) {
-//       student.lastName = capitalize(
-//         fullName.substring(fullName.lastIndexOf(" ")).trim()
-//       );
-//     }
-//     if (fullName.includes(`"`)) {
-//       student.middleName = null;
-//     } else if (fullName.includes(" ")) {
-//       student.middleName = fullName.substring(
-//         fullName.indexOf(" ") + 1,
-//         fullName.lastIndexOf(" ") + 1
-//       );
-//     } else {
-//       student.middleName = null;
-//     }
-//     if (fullName.includes(`"`)) {
-//       student.nickName = fullName.substring(
-//         fullName.indexOf(" ") + 1,
-//         fullName.lastIndexOf(" ") + 1
-//       );
-//     } else {
-//       student.nickName = null;
-//     }
-
-//     usableData.push(student);
-//   });
-//   filteredData = usableData;
-// }
-
-// DISPLAYING THE STUDENT LIST
-
-// function showData(students) {
-//   students.forEach((student) => {
-//     const clone = template.cloneNode(true);
-//     clone
-//       .querySelector("li")
-//       .addEventListener("click", () => showModal(student));
-//     clone.querySelector("[data-field=firstName]").innerHTML = student.firstName;
-//     clone.querySelector("[data-field=lastName]").innerHTML = student.lastName;
-
-//     clone.querySelector("[data-field=house]").innerHTML = student.house;
-
-//     body.appendChild(clone);
-//   });
-// }
-
-// DISPLAYING EACH STUDENT IN MODAL
-
-// function showModal(studentName) {
-//   modal.classList.remove("hide");
-//   modal.querySelector("#close").addEventListener("click", () => {
-//     modal.classList.add("hide");
-//   });
-//   modal.querySelector(".fullName").textContent = studentName.name;
-//   modal.querySelector(".firstName").textContent = studentName.firstName;
-//   modal.querySelector(".lastName").textContent = studentName.lastName;
-//   modal.querySelector(".middleName").textContent = studentName.middleName;
-//   modal.querySelector(".nickName").textContent = studentName.nickName;
-//   modal.querySelector(".house").textContent = studentName.house;
-// }
-
-// DROPDOWN FILTERING
-
-// function filterData() {
-//   if (dropdown.value === "all") {
-//     showData(filteredData);
-//     console.log("working");
-//   } else if (dropdown.value === "gryffindor") {
-//     console.log("gryffindor");
-//   } else if (dropdown.value === "slytherin") {
-//     console.log("slytherin");
-//   } else if (dropdown.value === "ravenclaw") {
-//     console.log("ravenclaw");
-//   } else if (dropdown.value === "hufflepuff") {
-//     console.log("hufflepuff");
-//   } else if (dropdown.value === "expelled") {
-//     console.log("expelled");
-//   } else if (dropdown.value === "prefects") {
-//     console.log("prefects");
-//   } else if (dropdown.value === "squad") {
-//     console.log("squad");
-//   }
-// }
 
 // SORTING FUNCTIONS
 

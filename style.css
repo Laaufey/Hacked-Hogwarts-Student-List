@@ -87,11 +87,11 @@ li h3.house {
   margin-top: 20vh;
 }
 .decisions {
-  background-color: white;
   text-align: left;
   width: 15vw;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 1em;
   grid-row: 3;
   grid-column: 1 / span 2;
   justify-self: center;
