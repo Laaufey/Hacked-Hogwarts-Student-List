@@ -4,11 +4,12 @@ window.addEventListener("DOMContentLoaded", start);
 
 const template = document.querySelector("template").content;
 const json = "https://petlatkea.dk/2020/hogwarts/students.json";
+const familynames = "https://petlatkea.dk/2020/hogwarts/families.json";
 const main = document.querySelector("main");
 const modal = document.querySelector(".modal-background");
 const dropdown = document.querySelector("select");
-dropdown.addEventListener("change", filterList);
-
+dropdown.addEventListener("change", selectFilter);
+let familyBlood;
 let allStudents = [];
 let usableData = [];
 let filteredData = [];
@@ -18,6 +19,7 @@ const Student = {
   middleName: "",
   nickName: "",
   house: "",
+  image: "",
   expelled: "",
   prefect: "",
   bloodStatus: "",
@@ -26,13 +28,20 @@ const Student = {
 
 function start() {
   loadData();
+  loadFamilies();
   registerBtns();
 }
-
 async function loadData() {
   const response = await fetch(json);
   const jsonData = await response.json();
   prepareObjects(jsonData);
+  console.log("hello");
+}
+async function loadFamilies() {
+  const response = await fetch(familynames);
+  const data = await response.json();
+  addBloodStatus(data);
+  console.log("hi mom");
 }
 
 // CAPITALIZE FUNCTION
@@ -60,6 +69,7 @@ function prepareObject(jsonObject) {
   const fullName = jsonObject.fullname.trim();
   student.name = capitalize(fullName);
   student.house = capitalize(jsonObject.house.trim());
+
   if (fullName.includes(" ")) {
     student.firstName = capitalize(
       fullName.substring(0, fullName.indexOf(" "))
@@ -90,19 +100,43 @@ function prepareObject(jsonObject) {
   } else {
     student.nickName = null;
   }
+
+  const lastNameFile = student.lastName.toLowerCase();
+  const firstLetterFile = student.firstName[0].toLowerCase();
+  const firstNameLow = student.firstName.toLowerCase();
+
+  if (lastNameFile.includes("-")) {
+    student.image =
+      "images/" +
+      lastNameFile.substring(lastNameFile.indexOf("-") + 1) +
+      "_" +
+      firstLetterFile +
+      "png";
+  } else if (lastNameFile.includes("patil")) {
+    student.image = "/images/" + lastNameFile + "_" + firstNameLow + ".png";
+  } else {
+    student.image = "/images/" + lastNameFile + "_" + firstLetterFile + ".png";
+  }
+
   return student;
 }
-
 function buildList() {
   const currentList = allStudents;
   displayList(currentList);
 }
 
+//DISPLAYING THE LIST OF STUDENTS
 function displayList(students) {
   document.querySelector("main").innerHTML = "";
   students.forEach(displayStudent);
+  if (students.length === 1) {
+    document.querySelector(".num-stud").textContent =
+      "Showing " + students.length + " student";
+  } else {
+    document.querySelector(".num-stud").textContent =
+      "Showing " + students.length + " students";
+  }
 }
-
 function displayStudent(student) {
   const clone = document.querySelector("template").content.cloneNode(true);
   clone.querySelector("li").addEventListener("click", () => showModal(student));
@@ -112,8 +146,77 @@ function displayStudent(student) {
   document.querySelector("main").appendChild(clone);
 }
 
+// MODAL
+function showModal(studentName) {
+  modal.classList.remove("hide");
+  modal.querySelector("#close").addEventListener("click", () => {
+    modal.classList.add("hide");
+  });
+  modal.querySelector(".fullName").textContent = studentName.name;
+  modal.querySelector(".firstName").textContent = studentName.firstName;
+  modal.querySelector(".lastName").textContent = studentName.lastName;
+  modal.querySelector(".middleName").textContent = studentName.middleName;
+  modal.querySelector(".nickName").textContent = studentName.nickName;
+  modal.querySelector(".house").textContent = studentName.house;
+  modal.querySelector(".student-image").src = studentName.image;
+
+  if (studentName.isPureBlood) {
+    modal.querySelector(".bloodStatus").textContent = "Pure Blood";
+  } else if (studentName.isHalfBlood) {
+    modal.querySelector(".bloodStatus").textContent = "Half Blood";
+  } else {
+    modal.querySelector(".bloodStatus").textContent = "Muggle Blood";
+  }
+}
+
+// EXPEL STUDENT
+
+// BLOOD
+// fara yfir og gera flottara og meira skiljanlegra en virkar
+function addBloodStatus(data) {
+  allStudents.forEach((student) => {
+    if (
+      data.half.includes(student.lastName) &
+      data.pure.includes(student.lastName)
+    ) {
+      data.half.splice(data.half.indexOf(student.lastName), 1);
+    }
+  });
+  setBloodStatus(data);
+}
+function setBloodStatus(list) {
+  allStudents.forEach((student) => {
+    if (list.half.includes(student.lastName)) {
+      student.isPureBlood = false;
+      student.isHalfBlood = true;
+    } else if (list.pure.includes(student.lastName)) {
+      student.isPureBlood = true;
+    } else {
+      student.isPureBlood = false;
+      student.isHalfBlood = false;
+    }
+  });
+}
+// if (familyBlood.half.includes(student.lastName)) {
+//   student.bloodStatus = "Halfblood";
+//   console.log("half");
+// } else if (familyBlood.pure.includes(student.lastName)) {
+//   student.bloodStatus = "Pureblood";
+//   console.log("pure");
+// } else {
+//   student.bloodStatus = "Muggleblood";
+//   console.log("muggle");
+// }
+
+// FILTERING AND SORTING FUNCTIONS
+function selectFilter() {
+  const filter = this.value;
+  console.log(`${filter}`);
+  filterList(filter);
+}
 function filterList() {
   let filteredList = allStudents;
+
   if (dropdown.value === "all") {
     displayList(filteredList);
     console.log("working");
@@ -279,10 +382,10 @@ function sortLastName(a, b) {
   }
 }
 
-function sortHouse(a, b) {
-  if (a.house < b.house) {
-    return -1;
-  } else {
-    return 1;
-  }
-}
+// function sortHouse(a, b) {
+//   if (a.house < b.house) {
+//     return -1;
+//   } else {
+//     return 1;
+//   }
+// }
