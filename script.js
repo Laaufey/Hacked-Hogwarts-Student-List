@@ -41,8 +41,8 @@ async function loadData() {
 }
 async function loadFamilies() {
   const response = await fetch(familynames);
-  const data = await response.json();
-  addBloodStatus(data);
+  familyBlood = await response.json();
+  addBloodStatus(familyBlood);
   console.log("hi mom");
 }
 
@@ -63,7 +63,6 @@ function registerBtns() {
 
 function prepareObjects(jsonData) {
   allStudents = jsonData.map(prepareObject);
-  // hackTheSystem();
   buildList();
 }
 function prepareObject(jsonObject) {
@@ -277,8 +276,13 @@ function removeSquad(studentName) {
 }
 function addSquad(studentName) {
   console.log("add squad");
-  studentName.squad = true;
-  showModal(studentName);
+  if (studentName.isPureBlood === true || studentName.house === "Slytherin") {
+    studentName.squad = true;
+    showModal(studentName);
+  } else {
+    studentName.squad = false;
+    alert("This student can't join the squad");
+  }
 }
 function expelStudent(studentName) {
   console.log("Expelled");
@@ -288,34 +292,6 @@ function expelStudent(studentName) {
   showModal(studentName);
   buildList();
 }
-// EXPEL STUDENT
-
-// function isExpelled() {
-//   for (let counter = 0; counter < allStudents.length; counter++) {
-//     if (allStudents[counter].firstName === "Laufey") {
-//     } else if (allStudents[counter].firstName === event.target.value) {
-//       allStudents[counter].expelled = true;
-//       // allStudents[counter].prefect = false;
-//       // allStudents[counter].inquisitorial = false;
-//       expelledData.push(allStudents[counter]);
-//       allStudents.splice(counter, 1);
-//       filteredList = allStudents;
-//     }
-//   }
-//   if (event.target.value === "Laufey") {
-//     alert("Sorry not sorry");
-//   } else {
-//     document.querySelector("h3.prefected").textContent = "";
-//     document.querySelector("h3.inquisitorial").textContent = "";
-//     document.querySelector("#optionExpelled").classList.remove("hide");
-//     document.querySelector("#expellButton").disabled = true;
-//     document.querySelector("#prefectButton").disabled = true;
-//     document.querySelector("#inquisitorialButton").disabled = true;
-//     document.querySelector("h5.expelled").classList.remove("hide");
-//     modal.classList.add("hide");
-//     displayData(filteredData);
-//   }
-// }
 
 // BLOOD
 // fara yfir og gera flottara og meira skiljanlegra en virkar
@@ -335,13 +311,17 @@ function setBloodStatus(list) {
     if (list.half.includes(student.lastName)) {
       student.isPureBlood = false;
       student.isHalfBlood = true;
+      student.bloodStatus = "Half Blood";
     } else if (list.pure.includes(student.lastName)) {
       student.isPureBlood = true;
+      student.bloodStatus = "Pure Blood";
     } else {
       student.isPureBlood = false;
       student.isHalfBlood = false;
       student.isMuggle = true;
+      student.bloodStatus = "Muggle Blood";
     }
+    return student;
   });
 }
 
@@ -429,8 +409,10 @@ function sortLastName(a, b) {
 // }
 
 // HACKING
+document.querySelector(".hack").addEventListener("click", hackTheSystem);
 
 function hackTheSystem() {
+  console.log("hacking");
   addLaufey();
   randomizeBlood();
 }
@@ -443,22 +425,29 @@ function addLaufey() {
   me.house = "Gryffindor";
 
   allStudents.push(me);
+  buildList();
 }
 
 function expelLaufey() {
   alert("Sorry, not sorry! One step ahead of you there ;)");
 }
-
-// function randomizeBlood(student) {
-//   if (
-//     student.bloodStatus === "Half Blood" ||
-//     student.bloodStatus.includes("Muggle Blood")
-//   ) {
-//     document.querySelector(".bloodStatus") = "Pure Blood";
-//   } else {
-//     let bloodArray = ["Pure Blood", "Half Blood", "Muggle Blood"];
-//     let randomBlood = Math.floor(Math.random() * Math.floor(3));
-//     student.bloodStatus = bloodArray[randomBlood];
-//   }
-//   return student;
-// }
+function randomizeBlood() {
+  allStudents.forEach((student) => {
+    if (student.isHalfBlood === true || student.isMuggle === true) {
+      student.isHalfBlood = false;
+      student.isMuggle = false;
+      student.isPureBlood = true;
+    } else {
+      let randomBlood = Math.floor(Math.random() * 3);
+      student.isPureBlood = false;
+      if (randomBlood === 0) {
+        student.isPureBlood = true;
+      } else if (randomBlood === 1) {
+        student.isHalfBlood = true;
+      } else {
+        student.isMuggle = true;
+      }
+    }
+    // return student;
+  });
+}
