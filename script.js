@@ -7,8 +7,11 @@ const json = "https://petlatkea.dk/2020/hogwarts/students.json";
 const familynames = "https://petlatkea.dk/2020/hogwarts/families.json";
 const main = document.querySelector("main");
 const modal = document.querySelector(".modal-background");
+const bgColor = document.querySelector(".modal-content");
+document.querySelector(".reverse").addEventListener("click", reverse);
 const dropdown = document.querySelector("select");
 dropdown.addEventListener("change", selectFilter);
+
 let familyBlood;
 let allStudents = [];
 let usableData = [];
@@ -156,6 +159,7 @@ function displayStudent(student) {
 
 // MODAL
 function showModal(studentName) {
+  console.log("Showing modal for " + studentName.firstName);
   modal.classList.remove("hide");
   modal.querySelector("#close").addEventListener("click", () => {
     modal.classList.add("hide");
@@ -167,9 +171,23 @@ function showModal(studentName) {
   modal.querySelector(".nickName").textContent = studentName.nickName;
   modal.querySelector(".house").textContent = studentName.house;
   modal.querySelector("#student-image").src = studentName.image;
-  console.log(studentName.image);
+  // console.log(studentName.image);
   modal.querySelector("#house-crest").src = studentName.crest;
-  console.log(studentName.crest);
+  // console.log(studentName.crest);
+
+  if (studentName.house == "Slytherin") {
+    bgColor.style.backgroundImage = "linear-gradient(#0D6217, #AAAAAA)";
+    bgColor.style.color = "black";
+  } else if (studentName.house == "Gryffindor") {
+    bgColor.style.backgroundImage = "linear-gradient(#7F0909, #FFC500)";
+    bgColor.style.color = "black";
+  } else if (studentName.house == "Hufflepuff") {
+    bgColor.style.backgroundImage = "linear-gradient(#EEE117, #000000)";
+    bgColor.style.color = "white";
+  } else if (studentName.house == "Ravenclaw") {
+    bgColor.style.backgroundImage = "linear-gradient(#000A90, #946B2D)";
+    bgColor.style.color = "white";
+  }
 
   if (studentName.isPureBlood) {
     modal.querySelector(".bloodStatus").textContent = "Pure Blood";
@@ -199,14 +217,14 @@ function showModal(studentName) {
       .addEventListener("click", prefectOff);
   }
   function makePrefect() {
-    console.log("Is Prefect");
+    console.log(studentName.firstName + " is a Prefect");
     document
       .querySelector("#prefect-btn")
       .removeEventListener("click", makePrefect);
     addPrefect(studentName);
   }
   function prefectOff() {
-    console.log("Not a Prefect");
+    console.log(studentName.firstName + " is not a Prefect");
     document
       .querySelector("#prefect-btn")
       .removeEventListener("click", prefectOff);
@@ -229,14 +247,14 @@ function showModal(studentName) {
     document.querySelector("#squad-btn").addEventListener("click", squadOff);
   }
   function makeSquad() {
-    console.log("Is squad");
+    // console.log("Is squad");
     document
       .querySelector("#squad-btn")
       .removeEventListener("click", makeSquad);
     addSquad(studentName);
   }
   function squadOff() {
-    console.log("Not a squad");
+    // console.log("Not a squad");
     document.querySelector("#squad-btn").removeEventListener("click", squadOff);
     removeSquad(studentName);
   }
@@ -247,12 +265,12 @@ function showModal(studentName) {
     document.querySelector("#expel-btn").textContent = "Expel student";
     document.querySelector("#expel-btn").addEventListener("click", expelLaufey);
   } else if (studentName.expelled === false) {
-    console.log("is not Expelled");
+    console.log(studentName.firstName + " is not Expelled");
     document.querySelector("#expel-btn").textContent = "Expel student";
     document.querySelector("#expel-btn").addEventListener("click", expel);
     document.querySelector(".expelled").textContent = "";
   } else if (studentName.expelled === true) {
-    console.log("is Expelled");
+    console.log(studentName.firstName + " is Expelled");
     document.querySelector("#expel-btn").textContent = "Student is expelled";
     document.querySelector(".expelled").textContent = "EXPELLED";
   }
@@ -263,25 +281,23 @@ function showModal(studentName) {
 }
 // ADDING AND REMOVING FROM PREFECT AND SQUAD
 function removePrefect(studentName) {
-  console.log("remove prefectt");
+  console.log("remove prefect for " + studentName.firstName);
   studentName.prefect = false;
   showModal(studentName);
-  buildList();
 }
 function addPrefect(studentName) {
-  console.log("add prefectt");
+  console.log("add prefect for " + studentName.firstName);
   studentName.prefect = true;
   showModal(studentName);
-  buildList();
 }
 function removeSquad(studentName) {
-  console.log("remove squad");
+  // console.log("remove squad");
   studentName.squad = false;
   showModal(studentName);
   buildList();
 }
 function addSquad(studentName) {
-  console.log("add squad");
+  // console.log("add squad");
   if (studentName.isPureBlood === true || studentName.house === "Slytherin") {
     studentName.squad = true;
     showModal(studentName);
@@ -408,6 +424,10 @@ function sortLastName(a, b) {
   } else {
     return 1;
   }
+}
+function reverse() {
+  allStudents = allStudents.reverse();
+  displayList(allStudents);
 }
 // function sortHouse(a, b) {
 //   if (a.house < b.house) {

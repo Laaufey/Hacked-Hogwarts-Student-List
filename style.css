@@ -78,13 +78,15 @@ li h3.house {
   background-color: rgba(0, 0, 0, 0.7);
 }
 .modal-content {
-  background-color: pink;
+  background-color: burlywood;
   margin: 1em;
   padding: 2em;
   text-align: center;
   width: 50vw;
   margin: 0 auto;
   margin-top: 20vh;
+  border-radius: 10%;
+  box-shadow: 10px 10px 30px 0px rgba(0, 0, 0, 0.8);
 }
 .decisions {
   text-align: left;
