@@ -240,6 +240,8 @@ function showModal(studentName) {
     document.querySelector("#squad-btn").removeEventListener("click", squadOff);
     removeSquad(studentName);
   }
+
+  // EXPELLING
   if (studentName.firstName === "Laufey") {
     console.log("Hi Laufey");
     document.querySelector("#expel-btn").textContent = "Expel student";
@@ -248,7 +250,8 @@ function showModal(studentName) {
     console.log("is not Expelled");
     document.querySelector("#expel-btn").textContent = "Expel student";
     document.querySelector("#expel-btn").addEventListener("click", expel);
-  } else {
+    document.querySelector(".expelled").textContent = "";
+  } else if (studentName.expelled === true) {
     console.log("is Expelled");
     document.querySelector("#expel-btn").textContent = "Student is expelled";
     document.querySelector(".expelled").textContent = "EXPELLED";
@@ -263,25 +266,31 @@ function removePrefect(studentName) {
   console.log("remove prefectt");
   studentName.prefect = false;
   showModal(studentName);
+  buildList();
 }
 function addPrefect(studentName) {
   console.log("add prefectt");
   studentName.prefect = true;
   showModal(studentName);
+  buildList();
 }
 function removeSquad(studentName) {
   console.log("remove squad");
   studentName.squad = false;
   showModal(studentName);
+  buildList();
 }
 function addSquad(studentName) {
   console.log("add squad");
   if (studentName.isPureBlood === true || studentName.house === "Slytherin") {
     studentName.squad = true;
     showModal(studentName);
+    buildList();
   } else {
     studentName.squad = false;
     alert("This student can't join the squad");
+    showModal(studentName);
+    buildList();
   }
 }
 function expelStudent(studentName) {
