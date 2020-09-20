@@ -11,12 +11,19 @@ const bgColor = document.querySelector(".modal-content");
 document.querySelector(".reverse").addEventListener("click", reverse);
 const dropdown = document.querySelector("select");
 dropdown.addEventListener("change", selectFilter);
+const search = document.querySelector(".search");
+search.addEventListener("input", startSearch);
 
 let familyBlood;
 let allStudents = [];
 let usableData = [];
 let filteredData = [];
 let expelledData = [];
+let prefectsGryffindor = [];
+let prefectsSlytherin = [];
+let prefectsRavenclaw = [];
+let prefectsHufflepuff = [];
+
 const Student = {
   firstName: "",
   lastName: "",
@@ -49,6 +56,14 @@ async function loadFamilies() {
   console.log("hi mom");
 }
 
+// SEARCHING STUDENTS
+
+function startSearch(event) {
+  let searchList = allStudents.filter((student) =>
+    student.name.toLowerCase().includes(event.target.value)
+  );
+  displayList(searchList);
+}
 // CAPITALIZE FUNCTION
 
 function capitalize(str) {
@@ -122,12 +137,12 @@ function prepareObject(jsonObject) {
       firstLetterFile +
       ".png";
   } else if (lastNameFile.includes("patil")) {
-    student.image = "/images/" + lastNameFile + "_" + firstNameLow + ".png";
+    student.image = "images/" + lastNameFile + "_" + firstNameLow + ".png";
   } else {
-    student.image = "/images/" + lastNameFile + "_" + firstLetterFile + ".png";
+    student.image = "images/" + lastNameFile + "_" + firstLetterFile + ".png";
   }
 
-  student.crest = "/" + houseFirstChar + "-crest.png";
+  student.crest = houseFirstChar + "-crest.png";
 
   return student;
 }
@@ -163,6 +178,17 @@ function showModal(studentName) {
   modal.classList.remove("hide");
   modal.querySelector("#close").addEventListener("click", () => {
     modal.classList.add("hide");
+    document
+      .querySelector("#prefect-btn")
+      .removeEventListener("click", prefectOff);
+    document
+      .querySelector("#prefect-btn")
+      .removeEventListener("click", makePrefect);
+    document.querySelector("#expel-btn").removeEventListener("click", expel);
+    document
+      .querySelector("#squad-btn")
+      .removeEventListener("click", makeSquad);
+    document.querySelector("#squad-btn").removeEventListener("click", squadOff);
   });
   modal.querySelector(".fullName").textContent = studentName.name;
   modal.querySelector(".firstName").textContent = studentName.firstName;
@@ -221,7 +247,7 @@ function showModal(studentName) {
     document
       .querySelector("#prefect-btn")
       .removeEventListener("click", makePrefect);
-    addPrefect(studentName);
+    checkingPrefectNumbers(studentName);
   }
   function prefectOff() {
     console.log(studentName.firstName + " is not a Prefect");
@@ -273,10 +299,42 @@ function showModal(studentName) {
     console.log(studentName.firstName + " is Expelled");
     document.querySelector("#expel-btn").textContent = "Student is expelled";
     document.querySelector(".expelled").textContent = "EXPELLED";
+    document.querySelector("#expel-btn").classList.add("disabled");
+    document.querySelector("#prefect-btn").classList.add("disabled");
+    document.querySelector("#squad-btn").classList.add("disabled");
   }
   function expel() {
     document.querySelector("#expel-btn").removeEventListener("click", expel);
     expelStudent(studentName);
+  }
+}
+function checkingPrefectNumbers(studentName) {
+  console.log("checkingPrefectNumbers");
+  let prefectArray = [];
+
+  if (studentName.house === "Gryffindor") {
+    prefectArray = prefectsGryffindor;
+  } else if (studentName.house === "Hufflepuff") {
+    prefectArray = prefectsHufflepuff;
+  } else if (studentName.house === "Ravenclaw") {
+    prefectArray = prefectsRavenclaw;
+  } else if (studentName.house === "Slytherin") {
+    prefectArray = prefectsSlytherin;
+  }
+
+  // console.log(prefectArray);
+
+  if (prefectArray.length < 2) {
+    studentName.prefect = true;
+    prefectArray.push(studentName);
+    showModal(studentName);
+    // console.log(student);
+  } else if (prefectArray.length > 1) {
+    alert(
+      "There can only be two prefects in each house! Remove someone else to make " +
+        studentName.firstName +
+        " a prefect."
+    );
   }
 }
 // ADDING AND REMOVING FROM PREFECT AND SQUAD
@@ -356,6 +414,7 @@ function selectFilter() {
   console.log(`${filter}`);
   filterList(filter);
 }
+
 function filterList() {
   let filteredList = allStudents;
 

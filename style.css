@@ -8,7 +8,7 @@
 
 #body {
   background-color: goldenrod;
-  background-image: url(/background2.jpg);
+  background-image: url(background2.jpg);
   background-size: 100vw;
 }
 
@@ -20,6 +20,21 @@ header {
   height: 40vh;
   margin: 5vh;
 }
+.hack {
+  float: right;
+  z-index: 1;
+  margin-top: 3em;
+  margin-right: 3em;
+  height: 5em;
+  width: 5em;
+  border-radius: 50%;
+  border: none;
+  background-color: rgba(0, 0, 0, 0);
+}
+.hack:hover {
+  background-color: darkred;
+  transition: 5s;
+}
 
 /* BANNER */
 #banner {
@@ -28,6 +43,21 @@ header {
 }
 h1 {
   font-family: harrypotter;
+}
+button,
+select,
+.search {
+  background-color: black;
+  color: lightgrey;
+  height: 3em;
+  border-radius: 2em;
+  border: none;
+  padding: 1em;
+  cursor: pointer;
+}
+button:hover {
+  background-color: darkred;
+  transition: 1.5s;
 }
 
 /* Student List */
@@ -53,6 +83,16 @@ li h3.house {
 /* MODAL */
 .hide {
   display: none;
+}
+.decisions > button {
+  height: auto;
+}
+.disabled {
+  background-color: dimgray;
+  cursor: help;
+}
+.disabled:hover {
+  background-color: dimgray;
 }
 #close {
   color: black;
@@ -97,6 +137,10 @@ li h3.house {
   grid-row: 3;
   grid-column: 1 / span 2;
   justify-self: center;
+}
+.expelled {
+  color: darkred;
+  font-size: 3em;
 }
 
 .head {
