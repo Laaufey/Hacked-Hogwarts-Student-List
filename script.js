@@ -36,6 +36,7 @@ async function loadData() {
   const response = await fetch(json);
   const jsonData = await response.json();
   prepareObjects(jsonData);
+
   console.log("hello");
 }
 async function loadFamilies() {
@@ -62,7 +63,7 @@ function registerBtns() {
 
 function prepareObjects(jsonData) {
   allStudents = jsonData.map(prepareObject);
-
+  // hackTheSystem();
   buildList();
 }
 function prepareObject(jsonObject) {
@@ -86,18 +87,22 @@ function prepareObject(jsonObject) {
   if (fullName.includes(`"`)) {
     student.middleName = "";
   } else if (fullName.includes(" ")) {
-    student.middleName = fullName.substring(
-      fullName.indexOf(" ") + 1,
-      fullName.lastIndexOf(" ") + 1
-    );
+    student.middleName =
+      "Middlename: " +
+      fullName.substring(
+        fullName.indexOf(" ") + 1,
+        fullName.lastIndexOf(" ") + 1
+      );
   } else {
     student.middleName = "";
   }
   if (fullName.includes(`"`)) {
-    student.nickName = fullName.substring(
-      fullName.indexOf(" ") + 1,
-      fullName.lastIndexOf(" ") + 1
-    );
+    student.nickName =
+      "Nickname: " +
+      fullName.substring(
+        fullName.indexOf(" ") + 1,
+        fullName.lastIndexOf(" ") + 1
+      );
   } else {
     student.nickName = "";
   }
@@ -105,6 +110,7 @@ function prepareObject(jsonObject) {
   const lastNameFile = student.lastName.toLowerCase();
   const firstLetterFile = student.firstName[0].toLowerCase();
   const firstNameLow = student.firstName.toLowerCase();
+  const houseFirstChar = student.house[0].toLowerCase();
 
   if (lastNameFile.includes("-")) {
     student.image =
@@ -112,12 +118,14 @@ function prepareObject(jsonObject) {
       lastNameFile.substring(lastNameFile.indexOf("-") + 1) +
       "_" +
       firstLetterFile +
-      "png";
+      ".png";
   } else if (lastNameFile.includes("patil")) {
     student.image = "/images/" + lastNameFile + "_" + firstNameLow + ".png";
   } else {
     student.image = "/images/" + lastNameFile + "_" + firstLetterFile + ".png";
   }
+
+  student.crest = "/" + houseFirstChar + "-crest.png";
 
   return student;
 }
@@ -160,6 +168,9 @@ function showModal(studentName) {
   modal.querySelector(".nickName").textContent = studentName.nickName;
   modal.querySelector(".house").textContent = studentName.house;
   modal.querySelector("#student-image").src = studentName.image;
+  console.log(studentName.image);
+  modal.querySelector("#house-crest").src = studentName.crest;
+  console.log(studentName.crest);
 
   if (studentName.isPureBlood) {
     modal.querySelector(".bloodStatus").textContent = "Pure Blood";
@@ -171,10 +182,11 @@ function showModal(studentName) {
   // MAKE PREFECT
 
   if (studentName.prefect === true) {
-    document.querySelector(".prefect").textContent = "is prefect";
+    document.querySelector(".prefect").textContent =
+      "Prefect of " + `${studentName.house}`;
     document.querySelector("#prefect-btn").textContent = "Remove as prefect";
   } else {
-    document.querySelector(".prefect").textContent = "not a prefect";
+    document.querySelector(".prefect").textContent = "";
     document.querySelector("#prefect-btn").textContent = "Make a prefect";
   }
 
@@ -208,7 +220,7 @@ function showModal(studentName) {
     document.querySelector(".squad").textContent = "is in the squad";
     document.querySelector("#squad-btn").textContent = "Remove from squad";
   } else {
-    document.querySelector(".squad").textContent = "not in the squad";
+    document.querySelector(".squad").textContent = "";
     document.querySelector("#squad-btn").textContent = "Put in the squad";
   }
 
@@ -229,8 +241,25 @@ function showModal(studentName) {
     document.querySelector("#squad-btn").removeEventListener("click", squadOff);
     removeSquad(studentName);
   }
+  if (studentName.firstName === "Laufey") {
+    console.log("Hi Laufey");
+    document.querySelector("#expel-btn").textContent = "Expel student";
+    document.querySelector("#expel-btn").addEventListener("click", expelLaufey);
+  } else if (studentName.expelled === false) {
+    console.log("is not Expelled");
+    document.querySelector("#expel-btn").textContent = "Expel student";
+    document.querySelector("#expel-btn").addEventListener("click", expel);
+  } else {
+    console.log("is Expelled");
+    document.querySelector("#expel-btn").textContent = "Student is expelled";
+    document.querySelector(".expelled").textContent = "EXPELLED";
+  }
+  function expel() {
+    document.querySelector("#expel-btn").removeEventListener("click", expel);
+    expelStudent(studentName);
+  }
 }
-
+// ADDING AND REMOVING FROM PREFECT AND SQUAD
 function removePrefect(studentName) {
   console.log("remove prefectt");
   studentName.prefect = false;
@@ -251,8 +280,16 @@ function addSquad(studentName) {
   studentName.squad = true;
   showModal(studentName);
 }
-
+function expelStudent(studentName) {
+  console.log("Expelled");
+  studentName.expelled = true;
+  allStudents.splice(allStudents.indexOf(studentName), 1);
+  expelledData.push(studentName);
+  showModal(studentName);
+  buildList();
+}
 // EXPEL STUDENT
+
 // function isExpelled() {
 //   for (let counter = 0; counter < allStudents.length; counter++) {
 //     if (allStudents[counter].firstName === "Laufey") {
@@ -303,19 +340,10 @@ function setBloodStatus(list) {
     } else {
       student.isPureBlood = false;
       student.isHalfBlood = false;
+      student.isMuggle = true;
     }
   });
 }
-// if (familyBlood.half.includes(student.lastName)) {
-//   student.bloodStatus = "Halfblood";
-//   console.log("half");
-// } else if (familyBlood.pure.includes(student.lastName)) {
-//   student.bloodStatus = "Pureblood";
-//   console.log("pure");
-// } else {
-//   student.bloodStatus = "Muggleblood";
-//   console.log("muggle");
-// }
 
 // FILTERING AND SORTING FUNCTIONS
 function selectFilter() {
@@ -343,6 +371,7 @@ function filterList() {
     filteredList = allStudents.filter(isHufflePuff);
   } else if (dropdown.value === "expelled") {
     console.log("expelled");
+    filteredList = expelledData;
   }
   displayList(filteredList);
 }
@@ -358,19 +387,8 @@ function isRavenclaw(student) {
 function isHufflePuff(student) {
   return student.house === "Hufflepuff";
 }
-function isPrefect(student) {
-  if (student.isPrefect === true) {
-    return true;
-  } else {
-    return false;
-  }
-}
-function isSquad(student) {
-  if (student.inInqSquad === true) {
-    return true;
-  } else {
-    return false;
-  }
+function isExpelled(student) {
+  return student.expelled === true;
 }
 function selectSort(event) {
   const sortBy = event.target.id;
@@ -395,7 +413,6 @@ function sortFirstName(a, b) {
     return 1;
   }
 }
-
 function sortLastName(a, b) {
   if (a.lastName < b.lastName) {
     return -1;
@@ -403,11 +420,45 @@ function sortLastName(a, b) {
     return 1;
   }
 }
-
 // function sortHouse(a, b) {
 //   if (a.house < b.house) {
 //     return -1;
 //   } else {
 //     return 1;
 //   }
+// }
+
+// HACKING
+
+function hackTheSystem() {
+  addLaufey();
+  randomizeBlood();
+}
+function addLaufey() {
+  let me = Object.create(Student);
+  me.firstName = "Laufey";
+  me.lastName = "Hjaltested";
+  me.middleName = "Cat";
+  me.nickName = "Hacker";
+  me.house = "Gryffindor";
+
+  allStudents.push(me);
+}
+
+function expelLaufey() {
+  alert("Sorry, not sorry! One step ahead of you there ;)");
+}
+
+// function randomizeBlood(student) {
+//   if (
+//     student.bloodStatus === "Half Blood" ||
+//     student.bloodStatus.includes("Muggle Blood")
+//   ) {
+//     document.querySelector(".bloodStatus") = "Pure Blood";
+//   } else {
+//     let bloodArray = ["Pure Blood", "Half Blood", "Muggle Blood"];
+//     let randomBlood = Math.floor(Math.random() * Math.floor(3));
+//     student.bloodStatus = bloodArray[randomBlood];
+//   }
+//   return student;
 // }
